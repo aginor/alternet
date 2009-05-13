@@ -24,12 +24,12 @@ public class ReadThread extends Thread{
         }
     }
     
-    public synchronized void addClientChannel(SocketChannel clientChannel) throws ClosedChannelException {
-        System.out.println(clientChannel.isBlocking());
-        clientChannel.register(selector, SelectionKey.OP_READ);
+    public synchronized void addClientChannel(SocketChannel clientChannel) throws IOException {
+        clientChannel.configureBlocking(false);
+        clientChannel.register(selector, clientChannel.validOps());
     }
     
-    public void run() {
+    public synchronized void run() {
         try {
             while(selector.select() > 0) {
                 Set keys = selector.selectedKeys();
