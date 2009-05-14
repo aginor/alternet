@@ -12,7 +12,11 @@ public class Test2 extends PApplet {
         background(color);
 
 		 c = new Client(this,"localhost",55665);
-		 c.connect();
+		 boolean success = c.connect();
+		 System.out.println(success);
+		 if(!success) {
+		     exit();
+		 }
 	}
 	
 	public void clientReceiveEvent(RemoteAddress address,String data) {
@@ -26,7 +30,12 @@ public class Test2 extends PApplet {
         if (mousePressed) {
                 line(mouseX,mouseY,pmouseX,pmouseY);
         }
-}
+	}
+	
+	public void disconnectedEvent(RemoteAddress address) {
+	    System.out.println("disconnected");
+	    exit();
+	}
 	
     /**
      * @param args

@@ -70,14 +70,8 @@ public class Client extends Thread{
 				
 				int read = channel.read(bf);
 				if(read == -1) {
-					if(clientDisconnectedEvent != null) {
-						try {
-							clientDisconnectedEvent.invoke(parent, new Object[]{remoteAddress});
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-					disconnect();
+					throwDisconnectedEvent();
+					
 					break;
 				}
 				bf.flip();
@@ -99,6 +93,7 @@ public class Client extends Thread{
 						e.printStackTrace();
 					}
 				}	
+				bf.clear();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -138,11 +133,22 @@ public class Client extends Thread{
 		} catch (IOException e) {
 			e.printStackTrace();
 			disconnect();
+			throwDisconnectedEvent();
 			return -1;
 		}
 	}
 	
-	public int writeData(int data){
+	private void throwDisconnectedEvent() {
+	    if(clientDisconnectedEvent != null) {
+            try {
+                clientDisconnectedEvent.invoke(parent, new Object[]{remoteAddress});
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } 
+    }
+
+    public int writeData(int data){
 		return writeData(Integer.toString(data));
 	}
 	
