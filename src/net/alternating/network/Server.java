@@ -42,10 +42,12 @@ public class Server extends Thread {
     	this.parent = parent;
         this.port = port;
         
+        parent.registerDispose(this);
+        
         connectedClients = new TreeMap();
     
         try {
-			connectEvent = parent.getClass().getMethod("connectEvent", new Class[]{Server.class,RemoteAddress.class} );
+			connectEvent = parent.getClass().getMethod("serverConnectEvent", new Class[]{Server.class,RemoteAddress.class} );
 		} catch (Exception e) {
 			//not declared, fine.
 			//so we won't invoke this method.
@@ -53,21 +55,21 @@ public class Server extends Thread {
 		}
 		
         try {
-			disconnectEvent = parent.getClass().getMethod("disconnectEvent", new Class[]{Server.class,RemoteAddress.class} );
+			disconnectEvent = parent.getClass().getMethod("serverDisconnectEvent", new Class[]{Server.class,RemoteAddress.class} );
 		} catch (Exception e) {
 			//not declared, fine.
 			//so we won't invoke this method.
 			disconnectEvent = null;
 		}
         try {
-			receiveEventString = parent.getClass().getMethod("receiveEventString", new Class[]{Server.class,RemoteAddress.class,String.class} );
+			receiveEventString = parent.getClass().getMethod("serverReceiveEvent", new Class[]{Server.class,RemoteAddress.class,String.class} );
 		} catch (Exception e) {
 			//not declared, fine.
 			//so we won't invoke this method.
 			receiveEventString = null;
 		}
 		try {
-			receiveEventByteArray = parent.getClass().getMethod("receiveEventByteArray", new Class[]{Server.class,RemoteAddress.class,byte[].class} );
+			receiveEventByteArray = parent.getClass().getMethod("serverReceiveEvent", new Class[]{Server.class,RemoteAddress.class,byte[].class} );
 		} catch (Exception e) {
 			//not declared, fine.
 			//so we won't invoke this method.
@@ -164,7 +166,7 @@ public class Server extends Thread {
     							}
     							if(receiveEventByteArray != null) {
         							bf.flip();
-    								byte[] data = bf.array();
+    								byte[] data = (byte[]) bf.array().clone();
     								RemoteAddress remoteSide = new RemoteAddress(clientChannel.socket().getInetAddress().toString(),clientChannel.socket().getPort());
     								Object[] args = {this,remoteSide,data};
     								try {
@@ -248,7 +250,23 @@ public class Server extends Thread {
     
 
     
-    
+    public void dispose() {
+    	
+    	try {
+			serverChannel.close();
+			Iterator keys = connectedClients.keySet().iterator();
+	    	while(keys.hasNext()) {
+	    		RemoteAddress address = (RemoteAddress) keys.next();
+	    		SocketChannel clientChannel = (SocketChannel) connectedClients.get(address);
+	    		clientChannel.close();
+	    	}
+	    	selector.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    }
         
     
 }

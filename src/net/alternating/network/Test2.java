@@ -2,21 +2,22 @@ package net.alternating.network;
 
 import processing.core.PApplet;
 
-public class Test extends PApplet{
-    
-	Server s;
+public class Test2 extends PApplet {
+
+	Client c;
 	
 	public void setup() {
 		size(400,400);
 		int color = color(0,255,0);
         background(color);
 
-		 s = new Server(this,55665);
+		 c = new Client(this,"localhost",55665);
+		 c.connect();
 	}
 	
-	public void serverReceiveEvent(Server server, RemoteAddress address,String data) {
+	public void clientReceiveEvent(RemoteAddress address,String data) {
 		this.print(data);
-		s.sendToAll(data.toUpperCase());
+		c.writeData("meep");
 	}
 	
 	
@@ -35,7 +36,4 @@ public class Test extends PApplet{
     	PApplet.main(new String[] {"--present","net.alternating.network.Test"});
         
     }
-    
-    
-    
 }
