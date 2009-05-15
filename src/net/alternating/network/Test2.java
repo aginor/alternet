@@ -21,7 +21,7 @@ public class Test2 extends PApplet {
 	
 	public void clientReceiveEvent(RemoteAddress address,String data) {
 		this.print(data);
-		c.writeData("meep");
+		c.send("meep");
 	}
 	
 	

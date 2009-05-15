@@ -1,3 +1,24 @@
+/*
+ * This is an alternative server/client library for Processing. 
+ * Copyright (C)2009 Andreas Löf 
+ * Email: andreas@alternating.net
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+
 package net.alternating.network;
 
 import java.io.IOException;
@@ -8,11 +29,32 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 import processing.core.PApplet;
 
+
+/**
+ * This class acts as a TCP client. It can be used to communicate with any TCP server, although it does 
+ * not contain support for any specific protocol.
+ * <p>
+ * The client is asynchronous and will notify the encapsulating processing applet when data is received over the network
+ * or when the network connection is broken.
+ * <p>
+ * The methods that the encapsulating processing applet can implement are:<br>
+ * <code>
+ * void clientReceiveEvent(RemoteAddress serverAddress, String data);<br>
+ * void clientReceiveEvent(RemoteAddress serverAddress, byte[] data);<br>
+ * void clientDisconnectedEvent(RemoteAddress serverAddress); <br>
+ * </code>
+ * 
+ * 
+ * @author Andreas Löf
+ * @see RemoteAddress
+ * @see Server
+ */
 public class Client extends Thread{
 	
 	private PApplet parent;
@@ -28,6 +70,14 @@ public class Client extends Thread{
 	private Method clientDisconnectedEvent;
 	private boolean run = true;
         
+	/**
+	 * This constructs a new client and initializes it. The client is however not connected and need
+	 * to explicitly be connected.
+	 * 
+	 * @param parent the encapsulating processing applet
+	 * @param ip the ip or address to connect to
+	 * @param port the port to connect to
+	 */
 	public Client(PApplet parent,String ip, int port) {
 		this.parent = parent;
 		this.remoteAddress = new RemoteAddress(ip,port);
@@ -63,36 +113,28 @@ public class Client extends Thread{
 		
 	}
 	
+	/**
+	 * This method perform the asynchronous reception of data.
+	 */
 	public void run() {
 		try {
-			ByteBuffer bf = ByteBuffer.allocate(5000);
+		    //FIXME this should be the same as in the server and not hardcoded like this
+			ByteBuffer bf = ByteBuffer.allocate(20000);
 			while(run) {
 				
+			    //read data
 				int read = channel.read(bf);
+				//have we lost the connection to the server
 				if(read == -1) {
 					throwDisconnectedEvent();
-					
 					break;
 				}
+				//nope, thus we proceed.
+				
 				bf.flip();
-				if(clientReceiveEventString != null) {
-					String data = decoder.decode(bf).toString();
-					Object[] args = {remoteAddress,data};
-					try {
-						clientReceiveEventString.invoke(parent, args);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				if(clientReceiveEventByteArray != null) {
-					byte[] data = (byte[]) bf.array().clone();
-					Object[] args = {remoteAddress,data};
-					try {
-						clientReceiveEventByteArray.invoke(parent, args);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}	
+				//deliver data
+				throwClientRecieveEventString(bf);
+				throwClientReceiveEventByteArray(bf);	
 				bf.clear();
 			}
 		} catch (IOException e) {
@@ -100,7 +142,51 @@ public class Client extends Thread{
 		}
 		
 	}
+	/**
+     * This is a helper method used to notify the encapsulating processing
+     * applet that we have received data. The data will be delivered to the
+     * processing applet as a byte[].
+     * 
+     * @param bf
+     *            the ByteBuffer containing the data
+     */
+    private void throwClientReceiveEventByteArray(ByteBuffer bf) {
+        if(clientReceiveEventByteArray != null) {
+        	byte[] data = (byte[]) bf.array().clone();
+        	Object[] args = {remoteAddress,data};
+        	try {
+        		clientReceiveEventByteArray.invoke(parent, args);
+        	} catch (Exception e) {
+        		e.printStackTrace();
+        	}
+        }
+    }
+
+    /**
+     * This is a helper method used to notify the encapsulating processing
+     * applet that we have received data. The data will be delivered to the
+     * processing applet as a String.
+     * 
+     * @param bf
+     *            the ByteBuffer containing the data
+     */
+    private void throwClientRecieveEventString(ByteBuffer bf)
+            throws CharacterCodingException {
+        if(clientReceiveEventString != null) {
+        	String data = decoder.decode(bf).toString();
+        	Object[] args = {remoteAddress,data};
+        	try {
+        		clientReceiveEventString.invoke(parent, args);
+        	} catch (Exception e) {
+        		e.printStackTrace();
+        	}
+        }
+    }
 	
+    /**
+     * This method establishes the connection and starts the thread that listens to the data.
+     * @return true if the connection was successfully established, false otherwise
+     */
 	public boolean connect() {
 		SocketAddress addr;
 		try {
@@ -125,8 +211,15 @@ public class Client extends Thread{
 	
 	
 	
-	
-	public int writeData(String data) {
+	/**
+	 * This client sends data to the server.
+	 * <p>
+	 * The method returns -1 and throws a disconnectedEvent if the connection has been broken.
+	 * 
+	 * @param data the data to be sent
+	 * @return the number of bytes sent to the server.
+	 */
+	public int send(String data) {
 		ByteBuffer bf = ByteBuffer.wrap(data.getBytes());
 		try {
 			return channel.write(bf);
@@ -138,6 +231,10 @@ public class Client extends Thread{
 		}
 	}
 	
+	/**
+	 * Helper function used to tell the encapsulating processing applet when we have lost the connection
+	 * to the server.
+	 */
 	private void throwDisconnectedEvent() {
 	    if(clientDisconnectedEvent != null) {
             try {
@@ -147,23 +244,54 @@ public class Client extends Thread{
             }
         } 
     }
-
-    public int writeData(int data){
-		return writeData(Integer.toString(data));
+	/**
+     * This client sends data to the server.
+     * <p>
+     * The method returns -1 and throws a disconnectedEvent if the connection has been broken.
+     * 
+     * @param data the data to be sent
+     * @return the number of bytes sent to the server.
+     */
+    public int send(int data){
+		return send(Integer.toString(data));
+	}
+    /**
+     * This client sends data to the server.
+     * <p>
+     * The method returns -1 and throws a disconnectedEvent if the connection has been broken.
+     * 
+     * @param data the data to be sent
+     * @return the number of bytes sent to the server.
+     */
+	public int send(double data) {
+		return send(Double.toString(data));
+	}
+	/**
+     * This client sends data to the server.
+     * <p>
+     * The method returns -1 and throws a disconnectedEvent if the connection has been broken.
+     * 
+     * @param data the data to be sent
+     * @return the number of bytes sent to the server.
+     */
+	public int send(byte data) {
+		return send(Byte.toString(data));
+	}
+	/**
+     * This client sends data to the server.
+     * <p>
+     * The method returns -1 and throws a disconnectedEvent if the connection has been broken.
+     * 
+     * @param data the data to be sent
+     * @return the number of bytes sent to the server.
+     */
+	public int send(byte[] data) {
+		return send(new String(data));
 	}
 	
-	public int writeData(double data) {
-		return writeData(Double.toString(data));
-	}
-	
-	public int writeData(byte data) {
-		return writeData(Byte.toString(data));
-	}
-	
-	public int writeData(byte[] data) {
-		return writeData(new String(data));
-	}
-	
+	/**
+	 * This method tears down the connection to the server and stops the worker thread.
+	 */
 	public void disconnect() {
 		try {
 			channel.close();
@@ -174,13 +302,13 @@ public class Client extends Thread{
 		dispose();
 	}
 	
+	/**
+	 * This is called by the encapsulating processing applet.
+	 * It closes the connection if it is not already closed.
+	 */
 	public void dispose() {
 		if(channel.isOpen())
-			try {
-				channel.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			disconnect();
 	}
 
 }
