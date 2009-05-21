@@ -19,14 +19,14 @@
  */
 
 
-package net.alternating.network;
+package net.alternating.alternet;
 
 /**
  * This is a simple class that is used to contain a hostname/ip-address and a
  * port. It is used to distinguish between clients and servers in the Server and
  * Client classes.
  * 
- * @author Andreas Löf
+ * @author Andreas L&ouml;f
  * @see Server
  * @see Client
  */

@@ -1,0 +1,7 @@
+This is a substitue network library for Processing.
+
+It provides an asynchronous interface to networking using the Java NIO functionality.
+
+Version 0.9.
+
+Copyright 2009, Andreas Löf.

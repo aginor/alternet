@@ -19,7 +19,7 @@
  */
 
 
-package net.alternating.network;
+package net.alternating.alternet;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -28,6 +28,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -51,7 +52,7 @@ import processing.core.PApplet;
  * </code>
  * 
  * 
- * @author Andreas Löf
+ * @author Andreas L&ouml;f
  * @see RemoteAddress
  * @see Server
  */
@@ -104,7 +105,7 @@ public class Client extends Thread{
 			clientReceiveEventByteArray = null;
 		}
 	    try {
-			clientDisconnectedEvent = parent.getClass().getMethod("clientDisconnectedEvent", new Class[]{RemoteAddress.class} );
+			clientDisconnectedEvent = parent.getClass().getMethod("clientDisconnectEvent", new Class[]{RemoteAddress.class} );
 		} catch (Exception e) {
 			//not declared, fine.
 			//so we won't invoke this method.
@@ -137,7 +138,11 @@ public class Client extends Thread{
 				throwClientReceiveEventByteArray(bf);	
 				bf.clear();
 			}
+		} catch (AsynchronousCloseException ace) {
+			// someone closed the socket, we do nothing more than exit the
+			// thread gracefully.
 		} catch (IOException e) {
+			throwDisconnectedEvent();
 			e.printStackTrace();
 		}
 		
@@ -299,7 +304,6 @@ public class Client extends Thread{
 			e.printStackTrace();
 		}
 		this.run  = false;
-		dispose();
 	}
 	
 	/**

@@ -18,7 +18,7 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package net.alternating.network;
+package net.alternating.alternet;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -63,7 +63,7 @@ import processing.core.PApplet;
  * <p>
  * The server itself runs in a separate thread.
  * 
- * @author Andreas Löf
+ * @author Andreas L&ouml;f
  * @see RemoteAddress
  * @see Client
  */
@@ -266,7 +266,7 @@ public class Server extends Thread {
                                 // writing, this is where
                                 // we'd handle it.
                                 // however, listening for the write status would
-                                // lead to us doing busy wating
+                                // lead to us doing busy waiting
                                 
                             }
                         }
@@ -525,6 +525,21 @@ public class Server extends Thread {
             e.printStackTrace();
         }
         
+    }
+    
+    /**
+     * This method is used to disconnect a specific client.
+     * @param clientAddress the address of the client to disconnect.
+     */
+    public void disconnectClient(RemoteAddress clientAddress) {
+    	SocketChannel clientChannel = (SocketChannel) connectedClients.get(clientAddress);
+    	if(clientChannel != null) {
+    		try {
+				clientChannel.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	}
     }
     
 }
