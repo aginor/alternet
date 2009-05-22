@@ -376,11 +376,7 @@ public class Server extends Thread {
      *            the data to be sent
      */
     public synchronized void sendToAll(String data) {
-        Iterator keys = connectedClients.keySet().iterator();
-        while (keys.hasNext()) {
-            RemoteAddress address = (RemoteAddress) keys.next();
-            this.sendTo(address, data);
-        }
+       this.sendToAll(data.getBytes());
     }
     
     /**
@@ -420,7 +416,11 @@ public class Server extends Thread {
      *            the data to be sent
      */
     public synchronized void sendToAll(byte[] data) {
-        this.sendToAll(new String(data));
+    	Iterator keys = connectedClients.keySet().iterator();
+        while (keys.hasNext()) {
+            RemoteAddress address = (RemoteAddress) keys.next();
+            this.sendTo(address, data);
+        }
     }
     
     /**
@@ -434,17 +434,7 @@ public class Server extends Thread {
      * @see RemoteAddress
      */
     public synchronized void sendTo(RemoteAddress address, String data) {
-        SocketChannel clientChannel = (SocketChannel) connectedClients
-                .get(address);
-        
-        ByteBuffer bf = ByteBuffer.wrap(data.getBytes());
-        
-        try {
-            clientChannel.write(bf);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
+        sendTo(address,data.getBytes());
     }
     
     /**
@@ -500,7 +490,22 @@ public class Server extends Thread {
      * @see RemoteAddress
      */
     public synchronized void sendTo(RemoteAddress address, byte[] data) {
-        this.sendTo(address, new String(data));
+    	 SocketChannel clientChannel = (SocketChannel) connectedClients
+         .get(address);
+ 
+    	 ByteBuffer bf = ByteBuffer.wrap(data);
+ 
+    	 try {
+    		 clientChannel.write(bf);
+    	 } catch (IOException e) {
+    		 connectedClients.remove(address);
+    		 try {
+				clientChannel.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+    		 e.printStackTrace();
+    	 }
     }
     
     /**
