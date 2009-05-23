@@ -3,7 +3,8 @@
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.2"/>
-    <property name="source" value="1.3"/>
+	<property name="source" value="1.3"/>
+	<property name="version" value="0.91"/>
 
     <path id="alternet.classpath">
         <pathelement location="bin"/>
@@ -38,14 +39,19 @@
     	</jar>
 	</target>
 	<target name="dist" depends="jar">
-     	<copy includeemptydirs="true" todir="dist/reference">
+     	<copy includeemptydirs="true" todir="dist/${ant.project.name}/reference">
             <fileset dir="reference"/>
         </copy>
-		<copy includeemptydirs="true" todir="dist/examples">
+		<copy includeemptydirs="true" todir="dist/${ant.project.name}/examples">
 		            <fileset dir="examples"/>
         </copy>
-		<copy todir="dist" file="README"/>
-		<copy todir="dist" file="LICENSE"/>
+		<copy todir="dist/${ant.project.name}" file="README"/>
+		<copy todir="dist/${ant.project.name}" file="LICENSE"/>
+		<copy todir="dist/${ant.project.name}" file="INSTALL"/>
+		<zip destfile="dist/${ant.project.name}.zip"
+		       basedir="dist/"
+			excludes="**.zip"
+		  />
 	</target>
 	<target name="javadoc">
         <javadoc access="public" classpathref="alternet.classpath" author="true" destdir="reference" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="net.alternating.alternet" source="1.3" sourcepath="src" splitindex="false" use="true" version="true"/>
