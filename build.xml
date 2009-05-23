@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="alternet">
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.2"/>
+    <property name="source" value="1.3"/>
+
+    <path id="alternet.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="../../../Desktop/processing-1.0.3/lib/core.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+	  	<mkdir dir="dist/${ant.project.name}/library"/>	
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src" excludes="**/*.launch, **/*.java"/>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    	<delete dir="reference" />
+        <delete dir="dist" />
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="init" name="build">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="alternet.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+	<target name="jar" depends="build,javadoc">
+    	<jar destfile="dist/${ant.project.name}/library/${ant.project.name}.jar">
+    		<fileset dir="bin" />
+    		<fileset dir="." excludes="dist/** bin/** .git/** .gitignore .classpath .project .settings/**">
+    		</fileset>
+    		    			
+    	</jar>
+	</target>
+	<target name="dist" depends="jar">
+	</target>
+	<target name="javadoc">
+        <javadoc access="public" classpathref="alternet.classpath" author="true" destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="net.alternating.alternet" source="1.3" sourcepath="src" splitindex="false" use="true" version="true"/>
+    </target>
+</project>
