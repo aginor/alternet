@@ -41,6 +41,6 @@
 	<target name="dist" depends="jar">
 	</target>
 	<target name="javadoc">
-        <javadoc access="public" classpathref="alternet.classpath" author="true" destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="net.alternating.alternet" source="1.3" sourcepath="src" splitindex="false" use="true" version="true"/>
+        <javadoc access="public" classpathref="alternet.classpath" author="true" destdir="reference" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="net.alternating.alternet" source="1.3" sourcepath="src" splitindex="false" use="true" version="true"/>
     </target>
 </project>
