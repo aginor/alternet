@@ -1,7 +1,46 @@
-This is a substitute network library for Processing.
+The alternet Processing library.
 
-It provides an asynchronous interface to networking using the Java NIO functionality.
+Copyright Andreas Löf, 2009.
+Email: andreas@alternating.net
+This code is licensed under the GPL version 2 which can be found in a seperate file called LICENSE.
 
-Version 0.91.
+This library is a substitute for the default Processing library. It utilizes the Java NIO package to gracefully deal with sockets while fully support asynchronous networking.
 
-Copyright 2009, Andreas Löf.
+One of the main focuses of the library is to make it as easy to use as possible for people that are not used to deal with networks. This is done by providing a very simple API and hiding as much of the socket functionality as possible. For example, unlike the normal Processing library, it is not necessary to call flush() after every write to make certain that the data is being sent.
+
+You can find the latest version and obtain the source at http://www.github.com/aginor/alternet
+
+This is version 0.91. It was released on 2009-05-23.
+
+
+Tested Platforms
+This library has been tested on Windows XP and Linux, both running Processing 1.03. The JRE used was the one that version of Processing ships.
+
+
+Examples
+There are two examples distributed with the code. One is a simple chat server that displays the number of connected clients.
+The second example is the client that communicates with the server.
+
+To run the examples, start the server first, then any clients.
+
+The port that the server will listen to is 34567 by default, and it will listen to connections on all your network interfaces.
+
+The client connects to localhost:34567, which is the machine you are using and the port 34567. You will need to change localhost into either an IP-address or a hostname if you try to connect to a different computer.
+Reporting Issues
+
+If you find a bug in the code, either submit a bugfix or report an issue at http://github.com/aginor/alternet/issues
+
+
+Accessing the Code
+You can either download a zip/tarball of the code or you can clone the git repository.
+The downloads are hosted at http://github.com/aginor/alternet/downloads.
+
+Each distribution also contains the source and the javadoc inside the alternet.jar file.
+
+
+Building
+Build the code by running ant -Dprocessing.core.path=/path/to/processing/lib/core.jar
+There are four ant targets that might be of interest, clean, build, jar, javadoc.
+Contributions
+Code contributions are only accepted as patches or a separate Git repository that can be pulled from.
+

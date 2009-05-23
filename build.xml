@@ -7,7 +7,7 @@
 
     <path id="alternet.classpath">
         <pathelement location="bin"/>
-        <pathelement location="../../../Desktop/processing-1.0.3/lib/core.jar"/>
+        <pathelement location="${processing.core.path}"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -35,10 +35,17 @@
     		<fileset dir="bin" />
     		<fileset dir="." excludes="dist/** bin/** .git/** .gitignore .classpath .project .settings/**">
     		</fileset>
-    		    			
     	</jar>
 	</target>
 	<target name="dist" depends="jar">
+     	<copy includeemptydirs="true" todir="dist/reference">
+            <fileset dir="reference"/>
+        </copy>
+		<copy includeemptydirs="true" todir="dist/examples">
+		            <fileset dir="examples"/>
+        </copy>
+		<copy todir="dist" file="README"/>
+		<copy todir="dist" file="LICENSE"/>
 	</target>
 	<target name="javadoc">
         <javadoc access="public" classpathref="alternet.classpath" author="true" destdir="reference" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="net.alternating.alternet" source="1.3" sourcepath="src" splitindex="false" use="true" version="true"/>
