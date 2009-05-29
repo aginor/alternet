@@ -40,7 +40,7 @@ void setup() {
   textFont(displayFont,16);
   size(640,480); 
 
-  //instanciate a new server that will connect to localhost on port 34567
+  //instantiate a new server that will connect to localhost on port 34567
   client = new Client(this,"127.0.0.1",34567);
 
   //connect to the server
