@@ -47,7 +47,7 @@
         </copy>
 		<copy todir="dist/${ant.project.name}" file="README"/>
 		<copy todir="dist/${ant.project.name}" file="LICENSE"/>
-		<copy todir="dist/${ant.project.name}" file="INSTALL"/>
+		<copy todir="dist" file="INSTALL"/>
 		<zip destfile="dist/${ant.project.name}-${version}.zip"
 		       basedir="dist/"
 			excludes="**.zip"
