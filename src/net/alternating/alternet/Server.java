@@ -33,9 +33,12 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
 
 import processing.core.PApplet;
 
@@ -85,7 +88,7 @@ public class Server extends Thread {
     private Method receiveEventString;
     private Method receiveEventByteArray;
     
-    private TreeMap connectedClients;
+    private Map connectedClients;
     
     private boolean run = true;
     
@@ -107,7 +110,7 @@ public class Server extends Thread {
         
         parent.registerDispose(this);
         
-        connectedClients = new TreeMap();
+        connectedClients = Collections.synchronizedMap(new TreeMap());
         
         try {
             connectEvent = parent.getClass().getMethod("serverConnectEvent",
