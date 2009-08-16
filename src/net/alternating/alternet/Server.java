@@ -231,8 +231,7 @@ public class Server extends Thread {
 								}
 
 								// notify the processing applet that we have a
-								// new
-								// connection
+								// new connection
 								throwConnectionEvent(remoteSide);
 
 							}
@@ -629,6 +628,19 @@ public class Server extends Thread {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * This method returns the number of currently connected clients to the server.
+	 * 
+	 * @return the number of connected clients.
+	 */
+	public int getNumberOfConnectedClients() {
+		int num = 0;
+		synchronized (connectedClients) {
+			num = connectedClients.size();
+		}
+		return num;
 	}
 
 }
