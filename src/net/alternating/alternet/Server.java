@@ -72,6 +72,8 @@ import processing.core.PApplet;
  */
 public class Server extends Thread {
 
+	public static int bufferSize = 256*1024;//*1024; 
+	
 	private int port;
 	private ServerSocketChannel serverChannel;
 	private ServerSocket serverSocket;
@@ -172,7 +174,7 @@ public class Server extends Thread {
 		// used to identify the server
 		SelectionKey serverKey;
 		// FIXME this is probably not big enough in the long run
-		ByteBuffer bf = ByteBuffer.allocate(20000);
+		ByteBuffer bf = ByteBuffer.allocate(bufferSize);
 
 		try {
 			// open a new selector
@@ -365,7 +367,10 @@ public class Server extends Thread {
 			SocketChannel clientChannel) {
 		if (receiveEventByteArray != null) {
 			bf.flip();
-			byte[] data = (byte[]) bf.array().clone();
+			//byte[] data = (byte[]) bf.array().clone();
+			int size = bf.limit();
+        	byte[] data = new byte[size];
+        	System.arraycopy(bf.array(), 0, data, 0, size);
 			RemoteAddress remoteSide = new RemoteAddress(clientChannel.socket()
 					.getInetAddress().toString(), clientChannel.socket()
 					.getPort());

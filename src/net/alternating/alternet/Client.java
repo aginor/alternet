@@ -58,6 +58,8 @@ import processing.core.PApplet;
  */
 public class Client extends Thread{
 	
+	public static int bufferSize = 256*1024;//*1024; 
+	
 	private PApplet parent;
 	private RemoteAddress remoteAddress;
 
@@ -120,7 +122,7 @@ public class Client extends Thread{
 	public void run() {
 		try {
 		    //FIXME this should be the same as in the server and not hardcoded like this
-			ByteBuffer bf = ByteBuffer.allocate(20000);
+			ByteBuffer bf = ByteBuffer.allocate(bufferSize);
 			while(run) {
 				
 			    //read data
@@ -157,7 +159,10 @@ public class Client extends Thread{
      */
     private void throwClientReceiveEventByteArray(ByteBuffer bf) {
         if(clientReceiveEventByteArray != null) {
-        	byte[] data = (byte[]) bf.array().clone();
+        	//byte[] data = (byte[]) bf.array().clone();
+        	int size = bf.limit();
+        	byte[] data = new byte[size];
+        	System.arraycopy(bf.array(), 0, data, 0, size);
         	Object[] args = {remoteAddress,data};
         	try {
         		clientReceiveEventByteArray.invoke(parent, args);
