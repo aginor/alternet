@@ -230,15 +230,7 @@ public class Client extends Thread{
 	 * @return the number of bytes sent to the server.
 	 */
 	public int send(String data) {
-		ByteBuffer bf = ByteBuffer.wrap(data.getBytes());
-		try {
-			return channel.write(bf);
-		} catch (IOException e) {
-			e.printStackTrace();
-			disconnect();
-			throwDisconnectedEvent();
-			return -1;
-		}
+		return send(data.getBytes());
 	}
 	
 	/**
@@ -296,7 +288,15 @@ public class Client extends Thread{
      * @return the number of bytes sent to the server.
      */
 	public int send(byte[] data) {
-		return send(new String(data));
+	    ByteBuffer bf = ByteBuffer.wrap(data);
+        try {
+            return channel.write(bf);
+        } catch (IOException e) {
+            e.printStackTrace();
+            disconnect();
+            throwDisconnectedEvent();
+            return -1;
+        }
 	}
 	
 	/**
