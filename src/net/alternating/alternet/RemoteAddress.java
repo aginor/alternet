@@ -48,27 +48,45 @@ public class RemoteAddress implements Comparable {
         this.port = port;
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    public boolean equals(Object o) {
-        RemoteAddress other = (RemoteAddress) o;
-        
-        return ip.equals(other.getIp()) && port == other.getPort();
-    }
+   
     
-    /*
-     * (non-Javadoc)
-     * 
+    /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-        return ip.hashCode() + port;
-    }
-    
-    /**
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
+		result = prime * result + port;
+		return result;
+	}
+
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RemoteAddress other = (RemoteAddress) obj;
+		if (ip == null) {
+			if (other.ip != null)
+				return false;
+		} else if (!ip.equals(other.ip))
+			return false;
+		if (port != other.port)
+			return false;
+		return true;
+	}
+
+
+
+	/**
      * Returns the address.
      * 
      * @return the address
@@ -100,6 +118,14 @@ public class RemoteAddress implements Comparable {
             return ip.compareTo(other.getIp());
         }
         
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+    	return ip + ":" + port;
     }
     
 }

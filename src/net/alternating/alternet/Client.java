@@ -63,7 +63,7 @@ public class Client extends Thread{
 	private PApplet parent;
 	private RemoteAddress remoteAddress;
 
-	private SocketChannel channel;
+	protected SocketChannel channel;
 	
 	private Charset charset = Charset.forName("UTF-8");
     private CharsetDecoder decoder = charset.newDecoder();
@@ -133,12 +133,11 @@ public class Client extends Thread{
 					break;
 				}
 				//nope, thus we proceed.
-				
-				bf.flip();
-				//deliver data
-				throwClientRecieveEventString(bf);
-				throwClientReceiveEventByteArray(bf);	
-				bf.clear();
+
+				//if(read > 0) {
+					System.out.println("read : " + read);
+					decodeData(bf, read);
+				//}
 			}
 		} catch (AsynchronousCloseException ace) {
 			// someone closed the socket, we do nothing more than exit the
@@ -149,6 +148,14 @@ public class Client extends Thread{
 		}
 		
 	}
+
+	protected void decodeData(ByteBuffer bf, int length) throws CharacterCodingException {
+		bf.flip();
+		//deliver data
+		throwClientRecieveEventString(bf);
+		throwClientReceiveEventByteArray(bf);	
+		bf.clear();
+	}
 	/**
      * This is a helper method used to notify the encapsulating processing
      * applet that we have received data. The data will be delivered to the
@@ -157,7 +164,7 @@ public class Client extends Thread{
      * @param bf
      *            the ByteBuffer containing the data
      */
-    private void throwClientReceiveEventByteArray(ByteBuffer bf) {
+    protected void throwClientReceiveEventByteArray(ByteBuffer bf) {
         if(clientReceiveEventByteArray != null) {
         	//byte[] data = (byte[]) bf.array().clone();
         	int size = bf.limit();
@@ -180,7 +187,7 @@ public class Client extends Thread{
      * @param bf
      *            the ByteBuffer containing the data
      */
-    private void throwClientRecieveEventString(ByteBuffer bf)
+    protected void throwClientRecieveEventString(ByteBuffer bf)
             throws CharacterCodingException {
         if(clientReceiveEventString != null) {
         	String data = decoder.decode(bf).toString();
@@ -237,7 +244,7 @@ public class Client extends Thread{
 	 * Helper function used to tell the encapsulating processing applet when we have lost the connection
 	 * to the server.
 	 */
-	private void throwDisconnectedEvent() {
+	protected void throwDisconnectedEvent() {
 	    if(clientDisconnectedEvent != null) {
             try {
                 clientDisconnectedEvent.invoke(parent, new Object[]{remoteAddress});
