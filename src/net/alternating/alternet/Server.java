@@ -576,7 +576,11 @@ public class Server extends Thread {
 			ByteBuffer bf = ByteBuffer.wrap(data);
 
 			try {
-				clientChannel.write(bf);
+				int written = 0;
+				while(written < data.length) {
+					int i = clientChannel.write(bf);
+					written += i;
+				}
 			} catch (IOException e) {
 				connectedClients.remove(address);
 				try {

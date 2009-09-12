@@ -51,6 +51,8 @@ public class ObjectClient extends Client {
 	}
 
 	protected void decodeData(ByteBuffer bf, int length) throws CharacterCodingException {
+		//System.out.println("c received> :" +length);
+		//System.out.println("total: " + read);
 		bf.flip();
 		decodeData2(bf, length);
 	}

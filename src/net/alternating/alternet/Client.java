@@ -126,6 +126,7 @@ public class Client extends Thread{
 			while(run) {
 				
 			    //read data
+				//System.out.println(channel.isBlocking());
 				int read = channel.read(bf);
 				//have we lost the connection to the server
 				if(read == -1) {
@@ -135,8 +136,9 @@ public class Client extends Thread{
 				//nope, thus we proceed.
 
 				//if(read > 0) {
-					System.out.println("read : " + read);
+					//System.out.println("read : " + read);
 					decodeData(bf, read);
+					bf.clear();
 				//}
 			}
 		} catch (AsynchronousCloseException ace) {

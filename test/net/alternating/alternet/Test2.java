@@ -4,16 +4,16 @@ import processing.core.PApplet;
 
 public class Test2 extends PApplet {
 
-	Client c;
+	ObjectClient c;
 	
 	public void setup() {
 		size(400,400);
-		int color = color(0,255,0);
+		int color = color(0,0,255);
         background(color);
 
-		 c = new Client(this,"localhost",55665);
+		 c = new ObjectClient(this,"localhost",55665);
 		 boolean success = c.connect();
-		 System.out.println(success);
+		 //System.out.println(success);
 		 if(!success) {
 		     exit();
 		 }
@@ -21,10 +21,9 @@ public class Test2 extends PApplet {
 	}
 	
 	public void clientReceiveEvent(RemoteAddress address,byte[] data) {
-		for(int i = 0; i < 300 && i < data.length; i++) {
-			System.out.print(data[i]+",");
-		}
-		this.print(data);
+		String path = selectInput("save");
+		println(path);
+		saveBytes(path, data);
 
 	}
 	
@@ -32,7 +31,7 @@ public class Test2 extends PApplet {
 	public void draw() {
         stroke(0);
         if (mousePressed) {
-                line(mouseX,mouseY,pmouseX,pmouseY);
+        	
         }
 	}
 	
