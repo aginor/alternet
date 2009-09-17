@@ -228,15 +228,7 @@ public class Server extends Thread implements Deliverer{
 												.toString(), newConnection
 												.socket().getPort());
 
-								// add it to our list of active connections
-								synchronized (connectedClients) {
-									connectedClients.put(remoteSide,
-											newConnection);
-								}
-
-								// notify the processing applet that we have a
-								// new connection
-								throwConnectionEvent(remoteSide);
+								newClientConnected(newConnection, remoteSide);
 
 							}
 							// it wasn't the server, thus it must be one of the
@@ -261,23 +253,7 @@ public class Server extends Thread implements Deliverer{
 
 									// is the socket closed?
 									if (bytesRead == -1) {
-
-										RemoteAddress remoteSide = new RemoteAddress(
-												clientChannel.socket()
-														.getInetAddress()
-														.toString(),
-												clientChannel.socket()
-														.getPort());
-
-										// clean up this socket
-										key.cancel();
-										synchronized (connectedClients) {
-											connectedClients.remove(remoteSide);
-										}
-										clientChannel.close();
-
-										// notify the processing applet
-										throwDisconnectedEvent(remoteSide);
+										clientDisconnected(key);
 									}
 									// we got data
 									else {
@@ -299,18 +275,7 @@ public class Server extends Thread implements Deliverer{
 						} catch (ClosedChannelException e) {
 							if (key != serverKey) {
 
-								SocketChannel clientChannel = (SocketChannel) key
-										.channel();
-
-								RemoteAddress remoteSide = new RemoteAddress(
-										clientChannel.socket().getInetAddress()
-												.toString(), clientChannel
-												.socket().getPort());
-
-								synchronized (connectedClients) {
-									connectedClients.remove(remoteSide);
-								}
-								key.cancel();
+								clientDisconnected(key);
 							}
 							try {
 								key.channel().close();
@@ -323,18 +288,7 @@ public class Server extends Thread implements Deliverer{
 						} catch (IOException e) {
 							if (key != serverKey) {
 
-								SocketChannel clientChannel = (SocketChannel) key
-										.channel();
-
-								RemoteAddress remoteSide = new RemoteAddress(
-										clientChannel.socket().getInetAddress()
-												.toString(), clientChannel
-												.socket().getPort());
-
-								synchronized (connectedClients) {
-									connectedClients.remove(remoteSide);
-								}
-								key.cancel();
+								clientDisconnected(key);
 							}
 							e.printStackTrace();
 						}
@@ -346,6 +300,39 @@ public class Server extends Thread implements Deliverer{
 			}
 
 		}
+	}
+
+	protected void clientDisconnected(SelectionKey key) {
+		RemoteAddress remoteSide = new RemoteAddress(
+				clientChannel.socket().getInetAddress()
+						.toString(), clientChannel
+						.socket().getPort());
+
+		if(clientChannel.isOpen())
+			try {
+				clientChannel.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		
+		synchronized (connectedClients) {
+			connectedClients.remove(remoteSide);
+		}
+		key.cancel();
+		throwDisconnectedEvent(remoteSide);
+	}
+
+	protected void newClientConnected(SocketChannel newConnection,
+			RemoteAddress remoteSide) {
+		// add it to our list of active connections
+		synchronized (connectedClients) {
+			connectedClients.put(remoteSide,
+					newConnection);
+		}
+
+		// notify the processing applet that we have a
+		// new connection
+		throwConnectionEvent(remoteSide);
 	}
 
     private void decodeData(ByteBuffer bf, int read, SocketChannel clientChannel)
@@ -578,17 +565,6 @@ public class Server extends Thread implements Deliverer{
 					.get(address);
 
 			ByteBuffer bf = ByteBuffer.wrap(data);
-		    public void throwRecieveEventByteArray(ByteBuffer data) {
-		        // TODO Auto-generated method stub
-		        
-		    }
-
-		    public void throwRecieveEventString(ByteBuffer data)
-		            throws CharacterCodingException {
-		        // TODO Auto-generated method stub
-		        
-		    }
-
 			try {
 				int written = 0;
 				while(written < data.length) {
