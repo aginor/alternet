@@ -34,7 +34,7 @@ public class ObjectDecoder {
     }
     
     public void decode(ByteBuffer bf, int length) throws CharacterCodingException {
-    switch(state){
+        switch(state){
         case STATE_SIZE:
             for(int i = 0; i < length && data.hasRemaining(); i++)
                 data.put(bf.get());
@@ -50,17 +50,21 @@ public class ObjectDecoder {
                 ByteBuffer oldData = data;
                 data = newData;
                 
-                int newLength = length - 4;
-                decode(oldData, newLength);
+                
+                if(length - 4 > 0) {
+                	int newLength = Math.min(length - 4,oldData.capacity() - 4);
+
+                	decode(oldData, oldData.capacity()-4);
+                }
                 if(length > oldData.capacity())
-                    decode(bf,oldData.capacity());
+                    decode(bf,length - oldData.capacity());
             }
             else {
                 read += length;
             }
             break;
         case STATE_DATA:
-            for(int i = 0; i < length && data.hasRemaining(); i++)
+            for(int i = 0; i < length && data.hasRemaining() && bf.hasRemaining(); i++)
                 data.put(bf.get());
             read += length;
             if(read == size) {

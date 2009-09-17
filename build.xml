@@ -4,7 +4,7 @@
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.2"/>
 	<property name="source" value="1.3"/>
-	<property name="version" value="0.94-pre5"/>
+	<property name="version" value="0.94-pre6"/>
 
     <path id="alternet.classpath">
         <pathelement location="bin"/>

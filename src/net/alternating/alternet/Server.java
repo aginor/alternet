@@ -70,10 +70,10 @@ import processing.core.PApplet;
  * @see RemoteAddress
  * @see Client
  */
-public class Server extends Thread implements Deliverer{
+public class Server extends Thread implements Deliverer {
 
-	public static int bufferSize = 256*1024*1024; 
-	
+	public static int bufferSize = 256 * 1024 * 1024;
+
 	private int port;
 	private ServerSocketChannel serverChannel;
 	private ServerSocket serverSocket;
@@ -93,7 +93,7 @@ public class Server extends Thread implements Deliverer{
 
 	private boolean run = true;
 
-    private SocketChannel clientChannel;
+	protected SocketChannel clientChannel;
 
 	/**
 	 * This constructs a new Server. The server will immediately start a new
@@ -235,8 +235,7 @@ public class Server extends Thread implements Deliverer{
 							// clients
 							else {
 
-								clientChannel = (SocketChannel) key
-										.channel();
+								clientChannel = (SocketChannel) key.channel();
 
 								// have we gotten new data?
 								if (key.isReadable()) {
@@ -258,7 +257,7 @@ public class Server extends Thread implements Deliverer{
 									// we got data
 									else {
 
-										decodeData(bf, bytesRead ,clientChannel);
+										decodeData(bf, bytesRead);
 									}
 								} else if (key.isWritable()) {
 									// if we cared about the channel being ready
@@ -303,18 +302,16 @@ public class Server extends Thread implements Deliverer{
 	}
 
 	protected void clientDisconnected(SelectionKey key) {
-		RemoteAddress remoteSide = new RemoteAddress(
-				clientChannel.socket().getInetAddress()
-						.toString(), clientChannel
-						.socket().getPort());
+		RemoteAddress remoteSide = new RemoteAddress(clientChannel.socket()
+				.getInetAddress().toString(), clientChannel.socket().getPort());
 
-		if(clientChannel.isOpen())
+		if (clientChannel.isOpen())
 			try {
 				clientChannel.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		
+
 		synchronized (connectedClients) {
 			connectedClients.remove(remoteSide);
 		}
@@ -326,8 +323,7 @@ public class Server extends Thread implements Deliverer{
 			RemoteAddress remoteSide) {
 		// add it to our list of active connections
 		synchronized (connectedClients) {
-			connectedClients.put(remoteSide,
-					newConnection);
+			connectedClients.put(remoteSide, newConnection);
 		}
 
 		// notify the processing applet that we have a
@@ -335,15 +331,17 @@ public class Server extends Thread implements Deliverer{
 		throwConnectionEvent(remoteSide);
 	}
 
-    private void decodeData(ByteBuffer bf, int read, SocketChannel clientChannel)
-            throws CharacterCodingException {
-        // throw a received event for String
-        // data
-        throwReceiveEventString(bf);
+	protected void decodeData(ByteBuffer bf, int read)
+			throws CharacterCodingException {
+		//flip the buffer around so it's right
+		bf.flip();
+		// throw a received event for String
+		// data
+		throwReceiveEventString(bf);
 
-        // throw a received event for a byte[]
-        throwReceiveEventByteArray(bf);
-    }
+		// throw a received event for a byte[]
+		throwReceiveEventByteArray(bf);
+	}
 
 	/**
 	 * This is a helper method used to notify the encapsulating processing
@@ -357,11 +355,11 @@ public class Server extends Thread implements Deliverer{
 	 */
 	public void throwReceiveEventByteArray(ByteBuffer bf) {
 		if (receiveEventByteArray != null) {
-			bf.flip();
-			//byte[] data = (byte[]) bf.array().clone();
+			
+			// byte[] data = (byte[]) bf.array().clone();
 			int size = bf.limit();
-        	byte[] data = new byte[size];
-        	System.arraycopy(bf.array(), 0, data, 0, size);
+			byte[] data = new byte[size];
+			System.arraycopy(bf.array(), 0, data, 0, size);
 			RemoteAddress remoteSide = new RemoteAddress(clientChannel.socket()
 					.getInetAddress().toString(), clientChannel.socket()
 					.getPort());
@@ -385,9 +383,10 @@ public class Server extends Thread implements Deliverer{
 	 *            the SocketChannel the data came from
 	 */
 
-	public void throwReceiveEventString(ByteBuffer bf) throws CharacterCodingException {
+	public void throwReceiveEventString(ByteBuffer bf)
+			throws CharacterCodingException {
 		if (receiveEventString != null) {
-			bf.flip();
+			
 			String data = decoder.decode(bf).toString();
 			RemoteAddress remoteSide = new RemoteAddress(clientChannel.socket()
 					.getInetAddress().toString(), clientChannel.socket()
@@ -567,7 +566,7 @@ public class Server extends Thread implements Deliverer{
 			ByteBuffer bf = ByteBuffer.wrap(data);
 			try {
 				int written = 0;
-				while(written < data.length) {
+				while (written < data.length) {
 					int i = clientChannel.write(bf);
 					written += i;
 				}
@@ -628,9 +627,10 @@ public class Server extends Thread implements Deliverer{
 			}
 		}
 	}
-	
+
 	/**
-	 * This method returns the number of currently connected clients to the server.
+	 * This method returns the number of currently connected clients to the
+	 * server.
 	 * 
 	 * @return the number of connected clients.
 	 */
@@ -641,7 +641,5 @@ public class Server extends Thread implements Deliverer{
 		}
 		return num;
 	}
-
-
 
 }
