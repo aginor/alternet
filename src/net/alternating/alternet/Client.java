@@ -56,7 +56,7 @@ import processing.core.PApplet;
  * @see RemoteAddress
  * @see Server
  */
-public class Client extends Thread{
+public class Client extends Thread implements Deliverer{
 	
 	public static int bufferSize = 256*1024;//*1024; 
 	
@@ -154,8 +154,8 @@ public class Client extends Thread{
 	protected void decodeData(ByteBuffer bf, int length) throws CharacterCodingException {
 		bf.flip();
 		//deliver data
-		throwClientRecieveEventString(bf);
-		throwClientReceiveEventByteArray(bf);	
+		throwReceiveEventString(bf);
+		throwReceiveEventByteArray(bf);	
 		bf.clear();
 	}
 	/**
@@ -166,7 +166,7 @@ public class Client extends Thread{
      * @param bf
      *            the ByteBuffer containing the data
      */
-    protected void throwClientReceiveEventByteArray(ByteBuffer bf) {
+    public void throwReceiveEventByteArray(ByteBuffer bf) {
         if(clientReceiveEventByteArray != null) {
         	//byte[] data = (byte[]) bf.array().clone();
         	int size = bf.limit();
@@ -189,7 +189,7 @@ public class Client extends Thread{
      * @param bf
      *            the ByteBuffer containing the data
      */
-    protected void throwClientRecieveEventString(ByteBuffer bf)
+    public void throwReceiveEventString(ByteBuffer bf)
             throws CharacterCodingException {
         if(clientReceiveEventString != null) {
         	String data = decoder.decode(bf).toString();

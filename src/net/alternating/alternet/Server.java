@@ -70,9 +70,9 @@ import processing.core.PApplet;
  * @see RemoteAddress
  * @see Client
  */
-public class Server extends Thread {
+public class Server extends Thread implements Deliverer{
 
-	public static int bufferSize = 256*1024;//*1024; 
+	public static int bufferSize = 256*1024*1024; 
 	
 	private int port;
 	private ServerSocketChannel serverChannel;
@@ -92,6 +92,8 @@ public class Server extends Thread {
 	private Map connectedClients;
 
 	private boolean run = true;
+
+    private SocketChannel clientChannel;
 
 	/**
 	 * This constructs a new Server. The server will immediately start a new
@@ -241,7 +243,7 @@ public class Server extends Thread {
 							// clients
 							else {
 
-								SocketChannel clientChannel = (SocketChannel) key
+								clientChannel = (SocketChannel) key
 										.channel();
 
 								// have we gotten new data?
@@ -280,14 +282,7 @@ public class Server extends Thread {
 									// we got data
 									else {
 
-										// throw a received event for String
-										// data
-										throwReceivedEventString(bf,
-												clientChannel);
-
-										// throw a received event for a byte[]
-										throwReceivedEventByteArray(bf,
-												clientChannel);
+										decodeData(bf, bytesRead ,clientChannel);
 									}
 								} else if (key.isWritable()) {
 									// if we cared about the channel being ready
@@ -353,6 +348,16 @@ public class Server extends Thread {
 		}
 	}
 
+    private void decodeData(ByteBuffer bf, int read, SocketChannel clientChannel)
+            throws CharacterCodingException {
+        // throw a received event for String
+        // data
+        throwReceiveEventString(bf);
+
+        // throw a received event for a byte[]
+        throwReceiveEventByteArray(bf);
+    }
+
 	/**
 	 * This is a helper method used to notify the encapsulating processing
 	 * applet that we have received data. The data will be delivered to the
@@ -363,8 +368,7 @@ public class Server extends Thread {
 	 * @param clientChannel
 	 *            the SocketChannel the data came from
 	 */
-	private void throwReceivedEventByteArray(ByteBuffer bf,
-			SocketChannel clientChannel) {
+	public void throwReceiveEventByteArray(ByteBuffer bf) {
 		if (receiveEventByteArray != null) {
 			bf.flip();
 			//byte[] data = (byte[]) bf.array().clone();
@@ -393,8 +397,8 @@ public class Server extends Thread {
 	 * @param clientChannel
 	 *            the SocketChannel the data came from
 	 */
-	private void throwReceivedEventString(ByteBuffer bf,
-			SocketChannel clientChannel) throws CharacterCodingException {
+
+	public void throwReceiveEventString(ByteBuffer bf) throws CharacterCodingException {
 		if (receiveEventString != null) {
 			bf.flip();
 			String data = decoder.decode(bf).toString();
@@ -574,6 +578,16 @@ public class Server extends Thread {
 					.get(address);
 
 			ByteBuffer bf = ByteBuffer.wrap(data);
+		    public void throwRecieveEventByteArray(ByteBuffer data) {
+		        // TODO Auto-generated method stub
+		        
+		    }
+
+		    public void throwRecieveEventString(ByteBuffer data)
+		            throws CharacterCodingException {
+		        // TODO Auto-generated method stub
+		        
+		    }
 
 			try {
 				int written = 0;
@@ -651,5 +665,7 @@ public class Server extends Thread {
 		}
 		return num;
 	}
+
+
 
 }
