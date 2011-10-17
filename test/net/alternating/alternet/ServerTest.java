@@ -5,6 +5,8 @@ import processing.core.PApplet;
 public class ServerTest extends PApplet {
 
 	ObjectServer s;
+	
+	String[] umlauts = {"audio0*Mit mei-nem schö-nen un-be-kann-ten Mäd-chen will ich nun bald zum Ziel,*1*17","audio15*Die-se, je-ne, sie gilt mir nicht mehr als an-dre Schö-ne,*1*14"};
 
 	public void setup() {
 		size(400, 400);
@@ -26,27 +28,39 @@ public class ServerTest extends PApplet {
 		//String received = new String(data);
 		//println("server received:" + received);
 		//s.sendToAll(received.toUpperCase());
-		String path = selectInput("save");
-		println("server:" + path);
-		saveBytes(path, data);
+		//String path = selectInput("save");
+		//println("server:" + path);
+		//saveBytes(path, data);
 	}
 
+	int num = 0;
 	public void draw() {
 		stroke(0);
-		if (mousePressed) {
+		
+		
+	}
+
+	public void mouseClicked() {
+		
+			//num++;
 			String loadPath = selectInput();  // Opens file chooser
         	if (loadPath == null) {
         	  // If a file was not selected
         	  println("No file was selected...");
         	} else {
-        	  // If a file was selected, print path to file
-        	  byte[] data = loadBytes(loadPath);
-        	  s.sendToAll(data);
+        		println("Sending");
+        		// If a file was selected, print path to file
+        		byte[] data = loadBytes(loadPath);
+        		s.sendToAll(data);
         	}
 			//line(mouseX, mouseY, pmouseX, pmouseY);
-		}
-	}
+			 
+			 
+			//println("sending: " + umlauts[num%2]);
+			//s.sendToAll(umlauts[num%2]);
 
+	}
+	
 	/**
 	 * @param args
 	 * @throws InterruptedException

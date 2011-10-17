@@ -37,6 +37,7 @@ public class ObjectClient extends Client {
 
 	protected void decodeData(ByteBuffer bf, int length) throws CharacterCodingException {
 		bf.flip();
+		bf.rewind();
 		d.decode(bf, length);
 	}
 	

@@ -46,6 +46,11 @@ public class ObjectDecoder {
                 data.rewind();
                 data.get(sizeBytes);
                 size = Utils.byteArrayToInt(sizeBytes);
+                if(size == 0) {
+                	state = STATE_SIZE;
+                	data.rewind();
+                	return;
+                }
                 ByteBuffer newData = ByteBuffer.allocate(size);
                 ByteBuffer oldData = data;
                 data = newData;
@@ -64,9 +69,12 @@ public class ObjectDecoder {
             }
             break;
         case STATE_DATA:
-            for(int i = 0; i < length && data.hasRemaining() && bf.hasRemaining(); i++)
+        	int copied = 0;
+            for(int i = 0; i < size && data.hasRemaining() && bf.hasRemaining(); i++) {
                 data.put(bf.get());
-            read += length;
+                copied++;
+            }
+            read += copied;
             if(read == size) {
                 deliverer.throwReceiveEventString(data);
                 deliverer.throwReceiveEventByteArray(data);

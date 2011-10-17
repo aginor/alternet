@@ -28,6 +28,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.CharacterCodingException;
@@ -192,7 +193,9 @@ public class Client extends Thread implements Deliverer{
     public void throwReceiveEventString(ByteBuffer bf)
             throws CharacterCodingException {
         if(clientReceiveEventString != null) {
-        	String data = decoder.decode(bf).toString();
+        	bf.rewind();
+        	CharBuffer charbuf = decoder.decode(bf); 
+        	String data = charbuf.toString();
         	Object[] args = {remoteAddress,data};
         	try {
         		clientReceiveEventString.invoke(parent, args);
