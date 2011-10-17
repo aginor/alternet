@@ -34,8 +34,7 @@
 	<target name="jar" depends="build,javadoc">
     	<jar destfile="dist/${ant.project.name}/library/${ant.project.name}.jar">
     		<fileset dir="bin" />
-    		<fileset dir="." excludes="dist/** bin/** .git/** .gitignore .classpath .project .settings/**">
-    		</fileset>
+    		<fileset dir="." includes="INSTALL,README,LICENSE,src/**" />
     	</jar>
 	</target>
 	<target name="dist" depends="jar">
