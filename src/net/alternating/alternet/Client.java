@@ -22,6 +22,7 @@
 package net.alternating.alternet;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -242,7 +243,12 @@ public class Client extends Thread implements Deliverer{
 	 * @return the number of bytes sent to the server.
 	 */
 	public int send(String data) {
-		return send(data.getBytes());
+		try {
+			return send(data.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return send(data.getBytes());
+		}
 	}
 	
 	/**

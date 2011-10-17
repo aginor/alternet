@@ -21,6 +21,7 @@
 package net.alternating.alternet;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -443,7 +444,12 @@ public class Server extends Thread implements Deliverer {
 	 *            the data to be sent
 	 */
 	public void sendToAll(String data) {
-		this.sendToAll(data.getBytes());
+		try {
+			this.sendToAll(data.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			this.sendToAll(data.getBytes());
+		}
 	}
 
 	/**
@@ -503,7 +509,12 @@ public class Server extends Thread implements Deliverer {
 	 * @see RemoteAddress
 	 */
 	public void sendTo(RemoteAddress address, String data) {
-		sendTo(address, data.getBytes());
+		try {
+			sendTo(address, data.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			sendTo(address, data.getBytes());
+		}
 	}
 
 	/**
