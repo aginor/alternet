@@ -1,6 +1,6 @@
 The alternet Processing library.
 
-Copyright Andreas Löf, 2009.
+Copyright Andreas Löf, 2011.
 Email: andreas@alternating.net
 This code is licensed under the GPL version 2 which can be found in a seperate file called LICENSE.
 
@@ -10,11 +10,11 @@ One of the main focuses of the library is to make it as easy to use as possible 
 
 You can find the latest version and obtain the source at http://www.github.com/aginor/alternet
 
-This is version 0.94-pre6. It was released on 2009-xx-xx.
+This is version 0.94-pre7. It was released on 2011-xx-xx.
 
 
 Tested Platforms
-This library has been tested on Windows XP and Linux, both running Processing 1.03. The JRE used was the one that version of Processing ships.
+This library has been tested on Linux, running Processing 1.5.1. The JRE used was the one that version of Processing ships.
 
 
 Examples
