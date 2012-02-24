@@ -1,7 +1,8 @@
 The alternet Processing library.
 
-Copyright Andreas Löf, 2011.
+Copyright Andreas Löf, 2012.
 Email: andreas@alternating.net
+Library homepage: https://github.com/aginor/alternet
 This code is licensed under the GPL version 2 which can be found in a seperate file called LICENSE.
 
 This library is a substitute for the default Processing library. It utilizes the Java NIO package to gracefully deal with sockets while fully support asynchronous networking.
@@ -10,7 +11,7 @@ One of the main focuses of the library is to make it as easy to use as possible 
 
 You can find the latest version and obtain the source at http://www.github.com/aginor/alternet
 
-This is version 0.94-pre7. It was released on 2011-xx-xx.
+This is version 0.94. It was released on 2012-02-25.
 
 
 Tested Platforms
